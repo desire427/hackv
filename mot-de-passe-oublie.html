@@ -10,32 +10,72 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .auth-container {
+            min-height: 100vh;
+            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1579684385127-1ef15d508118?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .auth-card {
+            backdrop-filter: blur(10px);
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+    </style>
 </head>
 <body class="font-sans">
-    <div class="container mt-5">
-        <div class="row justify-content-center">
-            <div class="col-lg-6">
-                <div class="card shadow-lg">
-                    <div class="card-body">
-                        <div class="text-center mb-4">
-                            <a href="index.html" class="d-flex align-items-center justify-content-center text-decoration-none">
-                                <i class="fas fa-prescription-bottle-alt text-3xl text-blue-600 me-2"></i>
-                                <span class="text-2xl font-bold">PharmaConnect</span>
-                            </a>
-                            <p class="text-gray-600 mt-2">Réinitialisez votre mot de passe</p>
-                        </div>
-                        <form id="forgotPasswordForm">
-                            <div class="mb-3">
-                                <label for="email" class="form-label">Adresse email</label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="fas fa-envelope"></i></span>
-                                    <input type="email" class="form-control" id="email" placeholder="votre@email.com" required>
+    <!-- Auth Container -->
+    <div class="auth-container flex items-center justify-center p-4">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-6">
+                    <div class="auth-card shadow-lg">
+                        <div class="row g-0">
+                            <!-- Right Side - Form -->
+                            <div class="col-md-12">
+                                <div class="p-5">
+                                    <div class="text-center mb-5">
+                                        <a href="index.html" class="d-flex align-items-center justify-content-center text-decoration-none">
+                                            <i class="fas fa-prescription-bottle-alt text-3xl text-blue-600 me-2"></i>
+                                            <span class="text-2xl font-bold">PharmaConnect</span>
+                                        </a>
+                                        <p class="text-gray-600 mt-2">Entrez votre adresse e-mail pour récupérer votre mot de passe</p>
+                                    </div>
+
+                                    <!-- Forgot Password Form -->
+                                    <form id="forgotPasswordForm">
+                                        <div class="mb-3">
+                                            <label for="email" class="form-label">Adresse email</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                                <input type="email" class="form-control" id="email" placeholder="votre@email.com" required>
+                                            </div>
+                                        </div>
+
+                                        <button type="submit" class="btn btn-primary w-100 py-2 mb-3">
+                                            <i class="fas fa-search me-2"></i> Rechercher
+                                        </button>
+
+                                        <div class="mb-3" id="passwordField" style="display: none;">
+                                            <label for="recoveredPassword" class="form-label">Votre mot de passe</label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" id="recoveredPassword" readonly>
+                                                <button class="btn btn-outline-secondary" type="button" id="toggleRecoveredPassword">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div class="text-center">
+                                            <p class="text-gray-600">Vous vous souvenez de votre mot de passe ? <a href="index.html" class="text-blue-600">Se connecter</a></p>
+                                        </div>
+                                    </form>
                                 </div>
                             </div>
-                            <button type="submit" class="btn btn-primary w-100 py-2">
-                                <i class="fas fa-paper-plane me-2"></i> Envoyer le lien de réinitialisation
-                            </button>
-                        </form>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -48,26 +88,29 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('forgotPasswordForm');
+            const passwordField = document.getElementById('passwordField');
+            const recoveredPassword = document.getElementById('recoveredPassword');
+            const toggleRecoveredPassword = document.getElementById('toggleRecoveredPassword');
+
+            toggleRecoveredPassword.addEventListener('click', function() {
+                const type = recoveredPassword.getAttribute('type') === 'text' ? 'password' : 'text';
+                recoveredPassword.setAttribute('type', type);
+                this.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+            });
+
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
 
                 const email = document.getElementById('email').value;
+                const users = JSON.parse(localStorage.getItem('users')) || [];
+                const userData = users.find(u => u.email === email);
 
-                // Retrieve data from localStorage
-                const storedUserData = localStorage.getItem('userData');
-
-                if (storedUserData) {
-                    const userData = JSON.parse(storedUserData);
-
-                    if (userData.email === email) {
-                        alert('Un lien de réinitialisation a été envoyé à votre adresse email.');
-                        // Rediriger vers une page de confirmation
-                        window.location.href = 'lien-envoye.html';
-                    } else {
-                        alert('Email non trouvé.');
-                    }
+                if (userData) {
+                    recoveredPassword.value = userData.password;
+                    passwordField.style.display = 'block';
                 } else {
-                    alert('Aucun utilisateur trouvé. Veuillez vous inscrire.');
+                    alert('Aucun compte trouvé avec cet email.');
+                    passwordField.style.display = 'none';
                 }
             });
         });
