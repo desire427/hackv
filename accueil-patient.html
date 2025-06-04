@@ -1,0 +1,1572 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PharmaConnect - Accueil</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Tesseract.js for OCR -->
+    <script src='https://unpkg.com/tesseract.js@4.1.1/dist/tesseract.min.js'></script>
+    <style>
+        .hero-section {
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1631815588090-7e59d8f1d7d1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80');
+            background-size: cover;
+            background-position: center;
+            min-height: 70vh;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .search-box {
+            backdrop-filter: blur(10px);
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Style du chatbot */
+        .chatbot-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: #1e40af;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .chatbot-btn:hover {
+            transform: scale(1.1);
+            background-color: #1e3a8a;
+        }
+
+        .chatbot-container {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            width: 350px;
+            height: 500px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chatbot-header {
+            background-color: #1e40af;
+            color: white;
+            padding: 15px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chatbot-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+        }
+
+        .chatbot-input {
+            display: flex;
+            padding: 10px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .chatbot-input input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #e5e7eb;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+
+        .chatbot-input button {
+            background-color: #1e40af;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 0 15px;
+            cursor: pointer;
+        }
+
+        /* Preview styles */
+        .preview-container {
+            max-height: 300px;
+            overflow: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-top: 15px;
+            background: #f9f9f9;
+        }
+
+        .preview-image {
+            max-width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .ocr-results {
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+
+        .progress-bar {
+            height: 5px;
+            background: #e0e0e0;
+            margin-top: 10px;
+        }
+
+        .progress {
+            height: 100%;
+            background: #1e40af;
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .select-pharmacy {
+            margin-left: 5px;
+        }
+
+        #sendToPharmacyBtn {
+            margin-left: 10px;
+        }
+
+        /* Style pour les miniatures des ordonnances enregistrées */
+        #savedPrescriptions {
+            gap: 10px;
+        }
+
+        #savedPrescriptions img {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 5px;
+            transition: transform 0.2s;
+        }
+
+        #savedPrescriptions img:hover {
+            transform: scale(1.1);
+        }
+
+        #closeBtn {
+            margin-right: 10px;
+        }
+
+        #reservationSection {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: #f9f9f9;
+        }
+    </style>
+</head>
+<body class="font-sans">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-blue-800 shadow-lg sticky-top">
+        <div class="container">
+            <a class="navbar-brand flex items-center" href="#">
+                <i class="fas fa-prescription-bottle-alt text-2xl mr-2"></i>
+                <span class="text-xl font-bold">PharmaConnect</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section flex items-center justify-center text-white">
+        <div class="container text-center">
+            <h1 class="text-4xl md:text-5xl font-bold mb-6">Trouvez vos médicaments en temps réel</h1>
+            <p class="text-xl mb-8">Localisez les pharmacies disposant de vos traitements et simplifiez votre parcours de soins</p>
+
+            <div class="search-box rounded-lg p-4 max-w-3xl mx-auto">
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control form-control-lg" placeholder="Rechercher un médicament...">
+                    <button class="btn btn-primary" type="button">
+                        <i class="fas fa-search"></i><a href="recherche.html">Rechercher</a>
+                    </button>
+                </div>
+                <div class="d-flex justify-content-center">
+                    <button class="btn btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#scanModal">
+                        <i class="fas fa-camera"></i> Scanner une ordonnance
+                    </button>
+                    <button class="btn btn-outline-primary" id="findPharmaciesBtn">
+                        <i class="fas fa-map-marker-alt"></i> Pharmacies proches
+                    </button>
+                </div>
+                <!-- Conteneur pour les miniatures des ordonnances enregistrées -->
+                <div id="savedPrescriptions" class="d-flex flex-wrap justify-content-center mt-3"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-12 bg-gray-50">
+        <div class="container">
+            <h2 class="text-3xl font-bold text-center mb-12">Nos solutions intelligentes</h2>
+
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="feature-card card h-100 border-0 shadow-sm rounded-lg overflow-hidden">
+                        <div class="card-body text-center p-5">
+                            <div class="bg-blue-100 text-blue-600 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-map-marked-alt text-2xl"></i>
+                            </div>
+                            <h3 class="text-xl font-bold mb-3">Géolocalisation en temps réel</h3>
+                            <p class="text-gray-600">Trouvez instantanément les pharmacies disposant de vos médicaments près de chez vous.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="feature-card card h-100 border-0 shadow-sm rounded-lg overflow-hidden">
+                        <div class="card-body text-center p-5">
+                            <div class="bg-green-100 text-green-600 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-robot text-2xl"></i>
+                            </div>
+                            <h3 class="text-xl font-bold mb-3">Assistant IA médical</h3>
+                            <p class="text-gray-600">Obtenez des réponses à vos questions sur les médicaments et leurs effets secondaires.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="feature-card card h-100 border-0 shadow-sm rounded-lg overflow-hidden">
+                        <div class="card-body text-center p-5">
+                            <div class="bg-purple-100 text-purple-600 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-chart-line text-2xl"></i>
+                            </div>
+                            <h3 class="text-xl font-bold mb-3">Prédiction des stocks</h3>
+                            <p class="text-gray-600">Notre IA anticipe les ruptures de stock pour vous éviter des déplacements inutiles.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How it Works -->
+    <section class="py-12 bg-white">
+        <div class="container">
+            <h2 class="text-3xl font-bold text-center mb-12">Comment ça marche ?</h2>
+
+            <div class="row align-items-center">
+                <div class="col-lg-6 mb-4">
+                    <img src="https://images.unsplash.com/photo-1587854692152-cbe660dbde88?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2069&q=80"
+                         alt="Processus PharmaConnect" class="rounded-lg shadow-lg w-full">
+                </div>
+                <div class="col-lg-6">
+                    <div class="d-flex mb-4">
+                        <div class="flex-shrink-0 bg-blue-100 text-blue-600 rounded-full w-12 h-12 flex items-center justify-center me-4">
+                            <span class="font-bold">1</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg">Recherchez votre médicament</h4>
+                            <p class="text-gray-600">Saisissez le nom du médicament ou scannez votre ordonnance.</p>
+                        </div>
+                    </div>
+
+                    <div class="d-flex mb-4">
+                        <div class="flex-shrink-0 bg-blue-100 text-blue-600 rounded-full w-12 h-12 flex items-center justify-center me-4">
+                            <span class="font-bold">2</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg">Consultez la disponibilité</h4>
+                            <p class="text-gray-600">Visualisez en temps réel les pharmacies disposant du traitement.</p>
+                        </div>
+                    </div>
+
+                    <div class="d-flex">
+                        <div class="flex-shrink-0 bg-blue-100 text-blue-600 rounded-full w-12 h-12 flex items-center justify-center me-4">
+                            <span class="font-bold">3</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg">Récupérez votre traitement</h4>
+                            <p class="text-gray-600">Réservez en ligne et retirez en pharmacie sans attente.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="py-12 bg-blue-50">
+        <div class="container">
+            <h2 class="text-3xl font-bold text-center mb-12">Ce que disent nos utilisateurs</h2>
+
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body p-4">
+                            <div class="d-flex mb-3">
+                                <img src="https://randomuser.me/api/portraits/women/32.jpg" class="rounded-circle me-3" width="50" height="50" alt="User">
+                                <div>
+                                    <h5 class="font-bold mb-0">Sophie Martin</h5>
+                                    <div class="text-yellow-400">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="text-gray-600">"Grâce à PharmaConnect, j'ai pu trouver un médicament rare en quelques minutes alors que je faisais le tour des pharmacies depuis 2 heures."</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body p-4">
+                            <div class="d-flex mb-3">
+                                <img src="https://randomuser.me/api/portraits/men/45.jpg" class="rounded-circle me-3" width="50" height="50" alt="User">
+                                <div>
+                                    <h5 class="font-bold mb-0">Pierre Dubois</h5>
+                                    <div class="text-yellow-400">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star-half-alt"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="text-gray-600">"L'application m'a sauvé la vie quand j'avais besoin d'un traitement urgent en voyage. Je ne m'en passe plus maintenant."</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body p-4">
+                            <div class="d-flex mb-3">
+                                <img src="https://randomuser.me/api/portraits/women/68.jpg" class="rounded-circle me-3" width="50" height="50" alt="User">
+                                <div>
+                                    <h5 class="font-bold mb-0">Dr. Claire Lemoine</h5>
+                                    <div class="text-yellow-400">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="text-gray-600">"En tant que médecin, je recommande PharmaConnect à tous mes patients. Cela simplifie considérablement leur accès aux soins."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-12 bg-blue-800 text-white">
+        <div class="container text-center">
+            <h2 class="text-3xl font-bold mb-6">Prêt à simplifier votre accès aux médicaments ?</h2>
+            <p class="text-xl mb-8">Téléchargez l'application ou inscrivez-vous dès maintenant</p>
+            <div class="d-flex justify-content-center gap-3">
+                <button class="btn btn-light btn-lg px-5">
+                    <i class="fab fa-apple me-2"></i> App Store
+                </button>
+                <button class="btn btn-light btn-lg px-5">
+                    <i class="fab fa-google-play me-2"></i> Google Play
+                </button>
+                <button class="btn btn-outline-light btn-lg px-5">
+                    Profil
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-8">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-4">
+                    <h3 class="text-xl font-bold mb-4 flex items-center">
+                        <i class="fas fa-prescription-bottle-alt text-2xl mr-2"></i>
+                        PharmaConnect
+                    </h3>
+                    <p class="text-gray-400">La solution intelligente pour un accès simplifié aux médicaments.</p>
+                    <div class="mt-4">
+                        <a href="#" class="text-gray-400 hover:text-white me-3"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white me-3"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white me-3"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+
+                <div class="col-lg-2 col-md-4 mb-4">
+                    <h4 class="font-bold mb-4">Navigation</h4>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#" class="text-gray-400 hover:text-white">Accueil</a></li>
+                        <li class="mb-2"><a href="#" class="text-gray-400 hover:text-white">Recherche</a></li>
+                        <li class="mb-2"><a href="#" class="text-gray-400 hover:text-white">Pharmacies</a></li>
+                        <li class="mb-2"><a href="#" class="text-gray-400 hover:text-white">Ordonnance</a></li>
+                        <li class="mb-2"><a href="#" class="text-gray-400 hover:text-white">Connexion</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-3 col-md-4 mb-4">
+                    <h4 class="font-bold mb-4">Liens utiles</h4>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#" class="text-gray-400 hover:text-white">FAQ</a></li>
+                        <li class="mb-2"><a href="#" class="text-gray-400 hover:text-white">Mentions légales</a></li>
+                        <li class="mb-2"><a href="#" class="text-gray-400 hover:text-white">Politique de confidentialité</a></li>
+                        <li class="mb-2"><a href="#" class="text-gray-400 hover:text-white">Conditions d'utilisation</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-3 col-md-4 mb-4">
+                    <h4 class="font-bold mb-4">Contact</h4>
+                    <ul class="list-unstyled text-gray-400">
+                        <li class="mb-2"><i class="fas fa-map-marker-alt me-2"></i> 123 Rue de la Santé, Paris</li>
+                        <li class="mb-2"><i class="fas fa-phone me-2"></i> +33 1 23 45 67 89</li>
+                        <li class="mb-2"><i class="fas fa-envelope me-2"></i> contact@pharmaconnect.fr</li>
+                    </ul>
+                </div>
+            </div>
+
+            <hr class="my-6 border-gray-700">
+
+            <div class="text-center text-gray-400">
+                <p>&copy; 2023 PharmaConnect. Tous droits réservés.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scan Modal -->
+    <div class="modal fade" id="scanModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Scanner ou importer une ordonnance</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <ul class="nav nav-tabs mb-4" id="scanTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="camera-tab" data-bs-toggle="tab" data-bs-target="#camera-tab-pane" type="button" role="tab">
+                                <i class="fas fa-camera me-2"></i>Prendre une photo
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="upload-tab" data-bs-toggle="tab" data-bs-target="#upload-tab-pane" type="button" role="tab">
+                                <i class="fas fa-upload me-2"></i>Importer un fichier
+                            </button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content" id="scanTabsContent">
+                        <!-- Camera Tab -->
+                        <div class="tab-pane fade show active" id="camera-tab-pane" role="tabpanel">
+                            <div class="text-center">
+                                <div id="cameraPreview" class="border-2 border-dashed border-gray-300 rounded-lg p-4 mb-3" style="min-height: 300px;">
+                                    <video id="video" width="100%" autoplay playsinline style="display: none;"></video>
+                                    <canvas id="canvas" style="display: none;"></canvas>
+                                    <div id="cameraPlaceholder" class="d-flex flex-column align-items-center justify-content-center h-100">
+                                        <i class="fas fa-camera text-4xl text-gray-400 mb-3"></i>
+                                        <p class="text-gray-500">Votre appareil photo va s'ouvrir pour scanner l'ordonnance</p>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex justify-content-center gap-3 mb-3">
+                                    <button id="startCamera" class="btn btn-primary">
+                                        <i class="fas fa-camera me-2"></i> Activer la caméra
+                                    </button>
+                                    <button id="captureBtn" class="btn btn-success" style="display: none;">
+                                        <i class="fas fa-camera me-2"></i> Capturer
+                                    </button>
+                                    <button id="retakeBtn" class="btn btn-warning" style="display: none;">
+                                        <i class="fas fa-redo me-2"></i> Reprendre
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Upload Tab -->
+                        <div class="tab-pane fade" id="upload-tab-pane" role="tabpanel">
+                            <div class="text-center">
+                                <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 mb-4">
+                                    <i class="fas fa-file-upload text-4xl text-gray-400 mb-3"></i>
+                                    <p class="text-gray-500 mb-3">Glissez-déposez votre fichier ici ou cliquez pour sélectionner</p>
+                                    <input type="file" id="fileInput" accept="image/*,.pdf" class="d-none">
+                                    <button id="selectFileBtn" class="btn btn-primary">
+                                        <i class="fas fa-folder-open me-2"></i> Sélectionner un fichier
+                                    </button>
+                                    <p class="small text-muted mt-2">Formats supportés: JPG, PNG, PDF (max 5MB)</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Preview Section -->
+                    <div id="previewSection" style="display: none;">
+                        <h6 class="mb-3">Aperçu de l'ordonnance</h6>
+                        <div class="preview-container" id="previewContainer">
+                            <!-- Preview content will be inserted here -->
+                        </div>
+
+                        <div class="progress-bar mt-3">
+                            <div class="progress" id="ocrProgress"></div>
+                        </div>
+                        <p id="ocrStatus" class="small text-muted mt-1">Analyse en cours...</p>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <button id="cancelBtn" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-2"></i> Annuler
+                            </button>
+                            <div>
+                                <button id="saveBtn" class="btn btn-success me-2">
+                                    <i class="fas fa-save me-2"></i> Enregistrer
+                                </button>
+                                <button id="closeBtn" class="btn btn-secondary me-2" style="display: none;">
+                                    <i class="fas fa-times me-2"></i> Fermer
+                                </button>
+                                <button id="sendToPharmacyBtn" class="btn btn-primary" style="display: none;">
+                                    <i class="fas fa-paper-plane me-2"></i> Envoyer à la pharmacie
+                                </button>
+                                <button id="reserveMedicationBtn" class="btn btn-info me-2" style="display: none;">
+                                    <i class="fas fa-calendar-check me-2"></i> Réserver
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- OCR Results -->
+                    <div id="ocrResults" class="mt-4" style="display: none;">
+                        <h6>Résultats de l'analyse</h6>
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i> Voici le texte extrait de votre ordonnance. Vérifiez et corrigez si nécessaire avant de valider.
+                        </div>
+                        <div class="ocr-results p-3 bg-light rounded" id="extractedText"></div>
+                        <div class="d-flex justify-content-end mt-3">
+                            <button id="editTextBtn" class="btn btn-outline-primary me-2">
+                                <i class="fas fa-edit me-2"></i> Modifier
+                            </button>
+                            <button id="validateBtn" class="btn btn-success">
+                                <i class="fas fa-check-circle me-2"></i> Valider
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Reservation Section -->
+                    <div id="reservationSection" style="display: none;">
+                        <h6 class="mb-3">Réservation de médicaments</h6>
+                        <div class="mb-3">
+                            <label for="medicationName" class="form-label">Nom du médicament</label>
+                            <input type="text" class="form-control" id="medicationName" placeholder="Nom du médicament">
+                        </div>
+                        <div class="mb-3">
+                            <label for="medicationQuantity" class="form-label">Quantité</label>
+                            <input type="number" class="form-control" id="medicationQuantity" placeholder="Quantité" min="1">
+                        </div>
+                        <div class="mb-3">
+                            <label for="pharmacySelect" class="form-label">Pharmacie</label>
+                            <select class="form-select" id="pharmacySelect">
+                                <option selected disabled>Sélectionnez une pharmacie</option>
+                                <!-- Les options seront ajoutées dynamiquement -->
+                            </select>
+                        </div>
+                        <div class="d-flex justify-content-between mt-4">
+                            <button id="cancelReservationBtn" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-2"></i> Annuler
+                            </button>
+                            <button id="confirmReservationBtn" class="btn btn-primary">
+                                <i class="fas fa-check me-2"></i> Confirmer la réservation
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="pharmaciesModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Pharmacies à proximité</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div id="map" style="height: 500px; width: 100%; border-radius: 8px;"></div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex mb-3">
+                                <input type="text" id="pharmacySearch" class="form-control" placeholder="Rechercher une pharmacie...">
+                                <button class="btn btn-primary ms-2" id="refreshLocation">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </div>
+                            <div id="pharmacyList" style="max-height: 430px; overflow-y: auto;">
+                                <!-- Les pharmacies seront chargées ici -->
+                                <div class="text-center py-5">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Chargement...</span>
+                                    </div>
+                                    <p class="mt-2">Chargement des pharmacies...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- Chatbot Button -->
+    <div class="chatbot-btn" id="chatbotBtn">
+        <i class="fas fa-robot fa-2x"></i>
+    </div>
+
+    <!-- Chatbot Container -->
+    <div class="chatbot-container" id="chatbotContainer">
+        <div class="chatbot-header">
+            <span>Assistant PharmaConnect</span>
+            <button id="closeChatbot" style="background: none; border: none; color: white; cursor: pointer;">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="chatbot-messages" id="chatbotMessages">
+            <div class="message bot-message mb-3 p-3 bg-gray-100 rounded-lg">
+                Bonjour ! Je suis l'assistant virtuel de PharmaConnect. Comment puis-je vous aider aujourd'hui ?
+            </div>
+        </div>
+        <div class="chatbot-input">
+            <input type="text" id="userInput" placeholder="Tapez votre message...">
+            <button id="sendMessage"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- PDF.js for PDF rendering -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.min.js"></script>
+    <script>
+        // Set PDF.js worker path
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.worker.min.js';
+    </script>
+    <!-- Custom JS -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animation for feature cards
+            const featureCards = document.querySelectorAll('.feature-card');
+
+            featureCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-10px)';
+                });
+
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = '';
+                });
+            });
+
+            // Simple search functionality
+            const searchBtn = document.querySelector('.btn-primary');
+            searchBtn.addEventListener('click', function() {
+                const searchInput = document.querySelector('.form-control');
+                if(searchInput.value.trim() !== '') {
+                    window.location.href = `recherche.html?q=${encodeURIComponent(searchInput.value)}`;
+                }
+            });
+
+            // Géolocalisation des pharmacies
+            const findPharmaciesBtn = document.getElementById('findPharmaciesBtn');
+            const pharmaciesModal = new bootstrap.Modal(document.getElementById('pharmaciesModal'));
+            let map, userMarker, pharmaciesLayer;
+            let userLocation = null;
+            let pharmaciesData = [];
+
+            // Base de données simulée des pharmacies au Sénégal
+            const senegalPharmacies = [
+                {
+                    id: 1,
+                    name: "Pharmacie du Plateau",
+                    address: "Rue Aimé Césaire, Dakar",
+                    lat: 14.6686,
+                    lng: -17.4229,
+                    phone: "33 821 24 24",
+                    open: true,
+                    hours: "08:00 - 20:00"
+                },
+                {
+                    id: 2,
+                    name: "Pharmacie de la Gueule Tapée",
+                    address: "Avenue Blaise Diagne, Dakar",
+                    lat: 14.6812,
+                    lng: -17.4467,
+                    phone: "33 821 34 56",
+                    open: false,
+                    hours: "09:00 - 22:00"
+                },
+                {
+                    id: 3,
+                    name: "Pharmacie Liberté 6",
+                    address: "Rue de la Liberté, Almadies",
+                    lat: 14.7234,
+                    lng: -17.4783,
+                    phone: "33 860 12 34",
+                    open: true,
+                    hours: "08:00 - 21:00"
+                },
+                {
+                    id: 4,
+                    name: "Pharmacie Grand Yoff",
+                    address: "Avenue Cheikh Anta Diop, Grand Yoff",
+                    lat: 14.7289,
+                    lng: -17.4567,
+                    phone: "33 854 78 90",
+                    open: true,
+                    hours: "24/7"
+                },
+                {
+                    id: 5,
+                    name: "Pharmacie Mermoz",
+                    address: "Rue Mermoz, Dakar",
+                    lat: 14.7098,
+                    lng: -17.4723,
+                    phone: "33 823 45 67",
+                    open: true,
+                    hours: "08:00 - 20:00"
+                },
+                {
+                    id: 6,
+                    name: "Pharmacie Sacré Coeur",
+                    address: "Rue du Docteur Thévenoud, Dakar",
+                    lat: 14.6778,
+                    lng: -17.4501,
+                    phone: "33 821 89 00",
+                    open: true,
+                    hours: "08:00 - 20:00"
+                },
+                {
+                    id: 7,
+                    name: "Pharmacie Fann",
+                    address: "Avenue Cheikh Anta Diop, Fann",
+                    lat: 14.6934,
+                    lng: -17.4678,
+                    phone: "33 825 67 89",
+                    open: true,
+                    hours: "08:00 - 22:00"
+                }
+            ];
+
+            // Bouton pour trouver les pharmacies
+            findPharmaciesBtn.addEventListener('click', function() {
+                pharmaciesModal.show();
+                initMap();
+            });
+
+            // Initialisation de la carte
+            function initMap() {
+                if (!map) {
+                    map = L.map('map').setView([14.6928, -17.4467], 13); // Position par défaut: Dakar
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    }).addTo(map);
+
+                    pharmaciesLayer = L.layerGroup().addTo(map);
+                }
+
+                // Obtenir la position de l'utilisateur
+                getUserLocation();
+            }
+
+            // Obtenir la localisation de l'utilisateur
+            function getUserLocation() {
+                const pharmacyList = document.getElementById('pharmacyList');
+                pharmacyList.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Chargement...</span></div><p class="mt-2">Localisation en cours...</p></div>';
+
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        function(position) {
+                            userLocation = {
+                                lat: position.coords.latitude,
+                                lng: position.coords.longitude
+                            };
+
+                            // Centrer la carte sur la position de l'utilisateur
+                            map.setView([userLocation.lat, userLocation.lng], 15);
+
+                            // Ajouter un marqueur pour l'utilisateur
+                            if (userMarker) {
+                                userMarker.setLatLng([userLocation.lat, userLocation.lng]);
+                            } else {
+                                userMarker = L.marker([userLocation.lat, userLocation.lng], {
+                                    icon: L.divIcon({
+                                        className: 'user-location-icon',
+                                        html: '<i class="fas fa-user" style="color: #1e40af; font-size: 24px;"></i>',
+                                        iconSize: [24, 24]
+                                    })
+                                }).addTo(map);
+                            }
+
+                            // Charger les pharmacies à proximité
+                            loadNearbyPharmacies();
+                        },
+                        function(error) {
+                            console.error("Erreur de géolocalisation:", error);
+                            pharmacyList.innerHTML = '<div class="alert alert-warning">Impossible d\'obtenir votre position. Utilisation de la position par défaut (Dakar).</div>';
+
+                            // Utiliser Dakar comme position par défaut
+                            userLocation = { lat: 14.6928, lng: -17.4467 };
+                            map.setView([userLocation.lat, userLocation.lng], 13);
+                            loadNearbyPharmacies();
+                        },
+                        { enableHighAccuracy: true, timeout: 10000 }
+                    );
+                } else {
+                    pharmacyList.innerHTML = '<div class="alert alert-warning">La géolocalisation n\'est pas supportée par votre navigateur. Utilisation de la position par défaut (Dakar).</div>';
+
+                    // Utiliser Dakar comme position par défaut
+                    userLocation = { lat: 14.6928, lng: -17.4467 };
+                    map.setView([userLocation.lat, userLocation.lng], 13);
+                    loadNearbyPharmacies();
+                }
+            }
+
+            // Charger les pharmacies à proximité
+            function loadNearbyPharmacies() {
+                const pharmacyList = document.getElementById('pharmacyList');
+                pharmacyList.innerHTML = '';
+
+                // Simuler une API avec un délai
+                setTimeout(() => {
+                    pharmaciesData = senegalPharmacies.map(pharma => {
+                        // Calculer la distance depuis l'utilisateur
+                        const distance = calculateDistance(
+                            userLocation.lat, userLocation.lng,
+                            pharma.lat, pharma.lng
+                        );
+
+                        return {
+                            ...pharma,
+                            distance: distance
+                        };
+                    }).sort((a, b) => a.distance - b.distance);
+
+                    // Afficher les pharmacies dans la liste
+                    displayPharmaciesList(pharmaciesData);
+
+                    // Afficher les pharmacies sur la carte
+                    displayPharmaciesOnMap(pharmaciesData);
+                }, 1000);
+            }
+
+            // Afficher la liste des pharmacies
+            function displayPharmaciesList(pharmacies) {
+                const pharmacyList = document.getElementById('pharmacyList');
+
+                if (pharmacies.length === 0) {
+                    pharmacyList.innerHTML = '<div class="alert alert-info">Aucune pharmacie trouvée à proximité.</div>';
+                    return;
+                }
+
+                pharmacies.forEach(pharma => {
+                    const pharmaElement = document.createElement('div');
+                    pharmaElement.className = 'card mb-3';
+                    pharmaElement.innerHTML = `
+                        <div class="card-body">
+                            <h5 class="card-title d-flex justify-content-between">
+                                <span>${pharma.name}</span>
+                                <span class="badge ${pharma.open ? 'bg-success' : 'bg-danger'}">
+                                    ${pharma.open ? 'Ouvert' : 'Fermé'}
+                                </span>
+                            </h5>
+                            <p class="card-text text-muted small">
+                                <i class="fas fa-map-marker-alt"></i> ${pharma.address}<br>
+                                <i class="fas fa-clock"></i> ${pharma.hours}<br>
+                                <i class="fas fa-phone"></i> ${pharma.phone}
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-primary">
+                                    <i class="fas fa-walking"></i> ${pharma.distance.toFixed(1)} km
+                                </span>
+                                <button class="btn btn-sm btn-outline-primary view-on-map" data-id="${pharma.id}">
+                                    <i class="fas fa-map-marked-alt"></i> Voir
+                                </button>
+                                <button class="btn btn-sm btn-primary select-pharmacy" data-id="${pharma.id}" data-name="${pharma.name}">
+                                    <i class="fas fa-paper-plane"></i> Envoyer
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    pharmacyList.appendChild(pharmaElement);
+                });
+
+                // Gérer le clic sur "Voir sur la carte"
+                document.querySelectorAll('.view-on-map').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const pharmaId = parseInt(this.getAttribute('data-id'));
+                        const pharmacy = pharmacies.find(p => p.id === pharmaId);
+
+                        if (pharmacy) {
+                            map.setView([pharmacy.lat, pharmacy.lng], 16);
+                        }
+                    });
+                });
+
+                // Gérer le clic sur "Envoyer"
+                document.querySelectorAll('.select-pharmacy').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const pharmaId = parseInt(this.getAttribute('data-id'));
+                        const pharmaName = this.getAttribute('data-name');
+                        const pharmacy = pharmacies.find(p => p.id === pharmaId);
+
+                        if (pharmacy) {
+                            // Stocker la pharmacie sélectionnée
+                            selectedPharmacy = pharmacy;
+
+                            // Fermer la modal des pharmacies
+                            pharmaciesModal.hide();
+
+                            // Afficher un message de confirmation
+                            alert(`Pharmacie "${pharmaName}" sélectionnée. Vous pouvez maintenant envoyer votre ordonnance.`);
+
+                            // Activer le bouton d'envoi dans la modal de scan
+                            const sendToPharmacyBtn = document.getElementById('sendToPharmacyBtn');
+                            if (sendToPharmacyBtn) {
+                                sendToPharmacyBtn.style.display = 'block';
+                                sendToPharmacyBtn.textContent = `Envoyer à ${pharmaName}`;
+                            }
+
+                            // Activer le bouton de réservation dans la modal de scan
+                            const reserveMedicationBtn = document.getElementById('reserveMedicationBtn');
+                            if (reserveMedicationBtn) {
+                                reserveMedicationBtn.style.display = 'block';
+                            }
+
+                            // Supprimer l'image de l'interface
+                            const thumbnail = savedPrescriptions.querySelector('img');
+                            if (thumbnail) {
+                                savedPrescriptions.removeChild(thumbnail.parentElement);
+                            }
+                        }
+                    });
+                });
+            }
+
+            // Afficher les pharmacies sur la carte
+            function displayPharmaciesOnMap(pharmacies) {
+                pharmaciesLayer.clearLayers();
+
+                pharmacies.forEach(pharma => {
+                    const marker = L.marker([pharma.lat, pharma.lng], {
+                        icon: L.divIcon({
+                            className: 'pharmacy-marker-icon',
+                            html: `<i class="fas fa-clinic-medical" style="color: ${pharma.open ? '#10b981' : '#ef4444'}; font-size: 24px;"></i>`,
+                            iconSize: [24, 24]
+                        })
+                    }).addTo(pharmaciesLayer);
+
+                    marker.bindPopup(`
+                        <b>${pharma.name}</b><br>
+                        ${pharma.address}<br>
+                        <i class="fas fa-phone"></i> ${pharma.phone}<br>
+                        <i class="fas fa-clock"></i> ${pharma.hours}<br>
+                        <span class="${pharma.open ? 'text-success' : 'text-danger'}">
+                            ${pharma.open ? 'Ouvert' : 'Fermé'}
+                        </span>
+                    `);
+                });
+            }
+
+            // Calculer la distance entre deux points (en km)
+            function calculateDistance(lat1, lon1, lat2, lon2) {
+                const R = 6371; // Rayon de la Terre en km
+                const dLat = (lat2 - lat1) * Math.PI / 180;
+                const dLon = (lon2 - lon1) * Math.PI / 180;
+                const a =
+                    Math.sin(dLat/2) * Math.sin(dLat/2) +
+                    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                    Math.sin(dLon/2) * Math.sin(dLon/2);
+                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+                return R * c;
+            }
+
+            // Recherche de pharmacies
+            document.getElementById('pharmacySearch').addEventListener('input', function(e) {
+                const searchTerm = e.target.value.toLowerCase();
+                const filtered = pharmaciesData.filter(pharma =>
+                    pharma.name.toLowerCase().includes(searchTerm) ||
+                    pharma.address.toLowerCase().includes(searchTerm)
+                );
+                displayPharmaciesList(filtered);
+            });
+
+            // Rafraîchir la localisation
+            document.getElementById('refreshLocation').addEventListener('click', function() {
+                getUserLocation();
+            });
+
+            // Style pour les marqueurs
+            const style = document.createElement('style');
+            style.textContent = `
+                .user-location-icon {
+                    background: transparent;
+                    border: none;
+                }
+                .pharmacy-marker-icon {
+                    background: transparent;
+                    border: none;
+                }
+                .leaflet-popup-content {
+                    font-size: 14px;
+                }
+                .leaflet-popup-content i {
+                    width: 16px;
+                    text-align: center;
+                    margin-right: 5px;
+                }
+            `;
+            document.head.appendChild(style);
+
+            // Scan Modal functionality
+            const scanModal = document.getElementById('scanModal');
+            if (scanModal) {
+                const bsModal = new bootstrap.Modal(scanModal);
+
+                // Camera elements
+                const video = document.getElementById('video');
+                const canvas = document.getElementById('canvas');
+                const startCameraBtn = document.getElementById('startCamera');
+                const captureBtn = document.getElementById('captureBtn');
+                const retakeBtn = document.getElementById('retakeBtn');
+                const cameraPlaceholder = document.getElementById('cameraPlaceholder');
+                const cameraPreview = document.getElementById('cameraPreview');
+                const previewSection = document.getElementById('previewSection');
+                const previewContainer = document.getElementById('previewContainer');
+                const ocrResults = document.getElementById('ocrResults');
+                const extractedText = document.getElementById('extractedText');
+                const ocrProgress = document.getElementById('ocrProgress');
+                const ocrStatus = document.getElementById('ocrStatus');
+                const confirmBtn = document.getElementById('confirmBtn');
+                const cancelBtn = document.getElementById('cancelBtn');
+                const validateBtn = document.getElementById('validateBtn');
+                const editTextBtn = document.getElementById('editTextBtn');
+                const selectFileBtn = document.getElementById('selectFileBtn');
+                const fileInput = document.getElementById('fileInput');
+                const sendToPharmacyBtn = document.getElementById('sendToPharmacyBtn');
+                const saveBtn = document.getElementById('saveBtn');
+                const closeBtn = document.getElementById('closeBtn');
+                const savedPrescriptions = document.getElementById('savedPrescriptions');
+                const reserveMedicationBtn = document.getElementById('reserveMedicationBtn');
+                const reservationSection = document.getElementById('reservationSection');
+                const medicationNameInput = document.getElementById('medicationName');
+                const medicationQuantityInput = document.getElementById('medicationQuantity');
+                const pharmacySelect = document.getElementById('pharmacySelect');
+                const cancelReservationBtn = document.getElementById('cancelReservationBtn');
+                const confirmReservationBtn = document.getElementById('confirmReservationBtn');
+
+                let stream = null;
+                let currentImageData = null;
+                let selectedPharmacy = null;
+
+                // Start camera
+                startCameraBtn.addEventListener('click', async function() {
+                    try {
+                        stream = await navigator.mediaDevices.getUserMedia({
+                            video: {
+                                facingMode: 'environment',
+                                width: { ideal: 1280 },
+                                height: { ideal: 720 }
+                            },
+                            audio: false
+                        });
+
+                        video.srcObject = stream;
+                        video.style.display = 'block';
+                        cameraPlaceholder.style.display = 'none';
+                        startCameraBtn.style.display = 'none';
+                        captureBtn.style.display = 'block';
+
+                        // Adjust video height to maintain aspect ratio
+                        video.onloadedmetadata = function() {
+                            const aspectRatio = video.videoWidth / video.videoHeight;
+                            const maxHeight = 500; // Max height for preview
+                            const calculatedWidth = maxHeight * aspectRatio;
+
+                            video.style.width = '100%';
+                            video.style.height = 'auto';
+                            cameraPreview.style.height = maxHeight + 'px';
+                        };
+                    } catch (err) {
+                        console.error("Error accessing camera: ", err);
+                        alert("Impossible d'accéder à la caméra. Veuillez vérifier les permissions.");
+                    }
+                });
+
+                // Capture image
+                captureBtn.addEventListener('click', function() {
+                    const context = canvas.getContext('2d');
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                    // Stop camera stream
+                    if (stream) {
+                        stream.getTracks().forEach(track => track.stop());
+                    }
+
+                    // Show captured image
+                    currentImageData = canvas.toDataURL('image/jpeg');
+                    showPreview(currentImageData);
+
+                    captureBtn.style.display = 'none';
+                    retakeBtn.style.display = 'block';
+
+                    // Show send to pharmacy button if a pharmacy is already selected
+                    if (selectedPharmacy) {
+                        sendToPharmacyBtn.style.display = 'block';
+                        sendToPharmacyBtn.textContent = `Envoyer à ${selectedPharmacy.name}`;
+                    }
+                });
+
+                // Retake photo
+                retakeBtn.addEventListener('click', function() {
+                    previewSection.style.display = 'none';
+                    startCameraBtn.style.display = 'block';
+                    retakeBtn.style.display = 'none';
+                    video.style.display = 'none';
+                    cameraPlaceholder.style.display = 'flex';
+                    sendToPharmacyBtn.style.display = 'none';
+
+                    // Clear previous data
+                    currentImageData = null;
+                    previewContainer.innerHTML = '';
+                });
+
+                // File upload handling
+                selectFileBtn.addEventListener('click', function() {
+                    fileInput.click();
+                });
+
+                fileInput.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (!file) return;
+
+                    // Check file size (max 5MB)
+                    if (file.size > 5 * 1024 * 1024) {
+                        alert('Le fichier est trop volumineux (max 5MB)');
+                        return;
+                    }
+
+                    // Check file type
+                    const validTypes = ['image/jpeg', 'image/png', 'application/pdf'];
+                    if (!validTypes.includes(file.type)) {
+                        alert('Format de fichier non supporté. Veuillez utiliser JPG, PNG ou PDF.');
+                        return;
+                    }
+
+                    if (file.type === 'application/pdf') {
+                        // Handle PDF file
+                        handlePDFFile(file);
+                    } else {
+                        // Handle image file
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            currentImageData = e.target.result;
+                            showPreview(currentImageData);
+
+                            // Show send to pharmacy button if a pharmacy is already selected
+                            if (selectedPharmacy) {
+                                sendToPharmacyBtn.style.display = 'block';
+                                sendToPharmacyBtn.textContent = `Envoyer à ${selectedPharmacy.name}`;
+                            }
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+
+                // Handle PDF files
+                function handlePDFFile(file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const typedarray = new Uint8Array(e.target.result);
+
+                        // Load the PDF
+                        pdfjsLib.getDocument(typedarray).promise.then(function(pdf) {
+                            // Get the first page
+                            return pdf.getPage(1);
+                        }).then(function(page) {
+                            const viewport = page.getViewport({ scale: 1.5 });
+                            const canvas = document.createElement('canvas');
+                            const context = canvas.getContext('2d');
+                            canvas.height = viewport.height;
+                            canvas.width = viewport.width;
+
+                            // Render PDF page to canvas
+                            const renderContext = {
+                                canvasContext: context,
+                                viewport: viewport
+                            };
+
+                            return page.render(renderContext).promise.then(function() {
+                                // Convert canvas to image data
+                                currentImageData = canvas.toDataURL('image/jpeg');
+                                showPreview(currentImageData);
+
+                                // Show send to pharmacy button if a pharmacy is already selected
+                                if (selectedPharmacy) {
+                                    sendToPharmacyBtn.style.display = 'block';
+                                    sendToPharmacyBtn.textContent = `Envoyer à ${selectedPharmacy.name}`;
+                                }
+                            });
+                        }).catch(function(error) {
+                            console.error('PDF rendering error: ', error);
+                            alert('Erreur lors du traitement du PDF.');
+                        });
+                    };
+                    reader.readAsArrayBuffer(file);
+                }
+
+                // Show preview of captured/uploaded image
+                function showPreview(imageData) {
+                    previewContainer.innerHTML = `
+                        <img src="${imageData}" class="preview-image" alt="Ordonnance scannée">
+                    `;
+                    previewSection.style.display = 'block';
+                }
+
+                // Send to pharmacy button
+                sendToPharmacyBtn.addEventListener('click', function() {
+                    if (!currentImageData) {
+                        alert('Veuillez d\'abord capturer ou importer une ordonnance.');
+                        return;
+                    }
+
+                    if (!selectedPharmacy) {
+                        alert('Veuillez d\'abord sélectionner une pharmacie.');
+                        return;
+                    }
+
+                    // Simulate sending the image to the pharmacy
+                    // In a real application, you would send the image data to your backend
+                    // which would then forward it to the selected pharmacy
+
+                    // Show loading state
+                    const loadingMessage = document.createElement('div');
+                    loadingMessage.className = 'alert alert-info';
+                    loadingMessage.innerHTML = `
+                        <div class="d-flex align-items-center">
+                            <div class="spinner-border spinner-border-sm me-2" role="status">
+                                <span class="visually-hidden">Chargement...</span>
+                            </div>
+                            Envoi de l'ordonnance à la pharmacie ${selectedPharmacy.name}...
+                        </div>
+                    `;
+                    previewContainer.innerHTML = '';
+                    previewContainer.appendChild(loadingMessage);
+
+                    // Simulate a delay for the sending process
+                    setTimeout(() => {
+                        // Show success message
+                        previewContainer.innerHTML = `
+                            <div class="alert alert-success">
+                                <i class="fas fa-check-circle me-2"></i>
+                                Votre ordonnance a été envoyée avec succès à la pharmacie ${selectedPharmacy.name}.
+                            </div>
+                            <div class="text-center">
+                                <button id="newPrescriptionBtn" class="btn btn-primary">
+                                    <i class="fas fa-plus me-2"></i> Nouvelle ordonnance
+                                </button>
+                            </div>
+                        `;
+
+                        // Remove the image from the interface
+                        const thumbnail = savedPrescriptions.querySelector('img[src="' + currentImageData + '"]');
+                        if (thumbnail) {
+                            savedPrescriptions.removeChild(thumbnail.parentElement);
+                        }
+
+                        // Add event listener for new prescription button
+                        document.getElementById('newPrescriptionBtn').addEventListener('click', function() {
+                            resetModal();
+                        });
+                    }, 2000);
+                });
+
+                // Save button
+                saveBtn.addEventListener('click', function() {
+                    if (!currentImageData) {
+                        alert('Veuillez d\'abord capturer ou importer une ordonnance.');
+                        return;
+                    }
+
+                    // Create a thumbnail of the image
+                    const thumbnail = document.createElement('div');
+                    thumbnail.className = 'position-relative me-2 mb-2';
+                    thumbnail.innerHTML = `
+                        <img src="${currentImageData}" class="rounded" style="width: 80px; height: 80px; object-fit: cover;">
+                        <button class="btn btn-sm btn-danger position-absolute top-0 end-0" style="font-size: 0.75rem; line-height: 1; padding: 0.25rem 0.5rem;">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    `;
+
+                    // Add the thumbnail to the container
+                    savedPrescriptions.appendChild(thumbnail);
+
+                    // Event listener for the delete button
+                    const deleteBtn = thumbnail.querySelector('.btn-danger');
+                    deleteBtn.addEventListener('click', function() {
+                        savedPrescriptions.removeChild(thumbnail);
+                    });
+
+                    // Hide the save button after saving the image
+                    saveBtn.style.display = 'none';
+
+                    // Show the close button
+                    closeBtn.style.display = 'block';
+                });
+
+                // Close button
+                closeBtn.addEventListener('click', function() {
+                    // Close the modal
+                    const scanModal = bootstrap.Modal.getInstance(document.getElementById('scanModal'));
+                    scanModal.hide();
+                });
+
+                // Cancel button
+                cancelBtn.addEventListener('click', function() {
+                    previewSection.style.display = 'none';
+                    previewContainer.innerHTML = '';
+                    currentImageData = null;
+                    sendToPharmacyBtn.style.display = 'none';
+
+                    // Reset tabs based on current view
+                    if (retakeBtn.style.display === 'block') {
+                        // Camera was used
+                        startCameraBtn.style.display = 'block';
+                        retakeBtn.style.display = 'none';
+                        video.style.display = 'none';
+                        cameraPlaceholder.style.display = 'flex';
+                    } else {
+                        // File was uploaded
+                        fileInput.value = '';
+                    }
+                });
+
+                // Reserve medication button
+                reserveMedicationBtn.addEventListener('click', function() {
+                    // Show reservation section
+                    reservationSection.style.display = 'block';
+
+                    // Load pharmacies for reservation
+                    loadPharmaciesForReservation();
+                });
+
+                // Cancel reservation button
+                cancelReservationBtn.addEventListener('click', function() {
+                    // Hide reservation section
+                    reservationSection.style.display = 'none';
+                });
+
+                // Confirm reservation button
+                confirmReservationBtn.addEventListener('click', function() {
+                    const medicationName = medicationNameInput.value.trim();
+                    const medicationQuantity = medicationQuantityInput.value.trim();
+                    const selectedPharmacyId = pharmacySelect.value;
+
+                    if (!medicationName || !medicationQuantity || !selectedPharmacyId) {
+                        alert('Veuillez remplir tous les champs.');
+                        return;
+                    }
+
+                    // Simulate reservation
+                    // In a real application, you would send the reservation data to your backend
+                    // which would then process the reservation
+
+                    // Show loading state
+                    const loadingMessage = document.createElement('div');
+                    loadingMessage.className = 'alert alert-info';
+                    loadingMessage.innerHTML = `
+                        <div class="d-flex align-items-center">
+                            <div class="spinner-border spinner-border-sm me-2" role="status">
+                                <span class="visually-hidden">Chargement...</span>
+                            </div>
+                            Réservation en cours...
+                        </div>
+                    `;
+                    reservationSection.innerHTML = '';
+                    reservationSection.appendChild(loadingMessage);
+
+                    // Simulate a delay for the reservation process
+                    setTimeout(() => {
+                        // Show success message
+                        reservationSection.innerHTML = `
+                            <div class="alert alert-success">
+                                <i class="fas fa-check-circle me-2"></i>
+                                Votre réservation a été effectuée avec succès.
+                            </div>
+                            <div class="text-center">
+                                <button id="newReservationBtn" class="btn btn-primary">
+                                    <i class="fas fa-plus me-2"></i> Nouvelle réservation
+                                </button>
+                            </div>
+                        `;
+
+                        // Add event listener for new reservation button
+                        document.getElementById('newReservationBtn').addEventListener('click', function() {
+                            resetReservationSection();
+                        });
+                    }, 2000);
+                });
+
+                // Function to load pharmacies for reservation
+                function loadPharmaciesForReservation() {
+                    // Clear existing options
+                    pharmacySelect.innerHTML = '<option selected disabled>Sélectionnez une pharmacie</option>';
+
+                    // Add pharmacies to the select
+                    pharmaciesData.forEach(pharma => {
+                        const option = document.createElement('option');
+                        option.value = pharma.id;
+                        option.textContent = `${pharma.name} (${pharma.address})`;
+                        pharmacySelect.appendChild(option);
+                    });
+                }
+
+                // Function to reset reservation section
+                function resetReservationSection() {
+                    medicationNameInput.value = '';
+                    medicationQuantityInput.value = '';
+                    pharmacySelect.innerHTML = '<option selected disabled>Sélectionnez une pharmacie</option>';
+                    reservationSection.style.display = 'none';
+                }
+
+                // Reset modal state
+                function resetModal() {
+                    // Reset camera tab
+                    if (stream) {
+                        stream.getTracks().forEach(track => track.stop());
+                        stream = null;
+                    }
+                    video.srcObject = null;
+                    video.style.display = 'none';
+                    canvas.style.display = 'none';
+                    cameraPlaceholder.style.display = 'flex';
+                    startCameraBtn.style.display = 'block';
+                    captureBtn.style.display = 'none';
+                    retakeBtn.style.display = 'none';
+                    sendToPharmacyBtn.style.display = 'none';
+
+                    // Reset file upload tab
+                    fileInput.value = '';
+
+                    // Reset preview and results
+                    previewSection.style.display = 'none';
+                    previewContainer.innerHTML = '';
+                    ocrResults.style.display = 'none';
+                    extractedText.textContent = '';
+
+                    // Clear current data
+                    currentImageData = null;
+                    selectedPharmacy = null;
+                }
+
+                // Reset modal when closed
+                scanModal.addEventListener('hidden.bs.modal', resetModal);
+            }
+
+            // Chatbot functionality
+            const chatbotBtn = document.getElementById('chatbotBtn');
+            const chatbotContainer = document.getElementById('chatbotContainer');
+            const closeChatbot = document.getElementById('closeChatbot');
+            const sendMessage = document.getElementById('sendMessage');
+            const userInput = document.getElementById('userInput');
+            const chatbotMessages = document.getElementById('chatbotMessages');
+
+            if (chatbotBtn && chatbotContainer) {
+                chatbotBtn.addEventListener('click', function() {
+                    chatbotContainer.style.display = chatbotContainer.style.display === 'flex' ? 'none' : 'flex';
+                });
+
+                closeChatbot.addEventListener('click', function() {
+                    chatbotContainer.style.display = 'none';
+                });
+
+                sendMessage.addEventListener('click', sendChatMessage);
+                userInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') sendChatMessage();
+                });
+
+                function sendChatMessage() {
+                    const message = userInput.value.trim();
+                    if (!message) return;
+
+                    // Add user message
+                    addMessage(message, 'user');
+                    userInput.value = '';
+
+                    // Simulate bot response
+                    setTimeout(() => {
+                        addMessage(getBotResponse(message), 'bot');
+                    }, 1000);
+                }
+
+                function addMessage(text, sender) {
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = `message ${sender}-message mb-3 p-3 rounded-lg`;
+                    messageDiv.style.backgroundColor = sender === 'bot' ? '#f3f4f6' : '#1e40af';
+                    messageDiv.style.color = sender === 'bot' ? '#111827' : 'white';
+                    messageDiv.style.alignSelf = sender === 'bot' ? 'flex-start' : 'flex-end';
+                    messageDiv.style.maxWidth = '80%';
+                    messageDiv.textContent = text;
+
+                    chatbotMessages.appendChild(messageDiv);
+                    chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+                }
+
+                function getBotResponse(userMessage) {
+                    const lowerMessage = userMessage.toLowerCase();
+
+                    if (lowerMessage.includes('bonjour') || lowerMessage.includes('salut')) {
+                        return "Bonjour ! Comment puis-je vous aider aujourd'hui ?";
+                    } else if (lowerMessage.includes('ordonnance') || lowerMessage.includes('scanner')) {
+                        return "Vous pouvez scanner votre ordonnance en cliquant sur le bouton 'Scanner une ordonnance' sur la page d'accueil. Ensuite, vous pourrez sélectionner une pharmacie à laquelle envoyer votre ordonnance.";
+                    } else if (lowerMessage.includes('médicament') || lowerMessage.includes('traitement')) {
+                        return "Pour trouver un médicament, vous pouvez utiliser la barre de recherche ou scanner votre ordonnance. Je peux également vous fournir des informations sur les médicaments si vous me donnez leur nom.";
+                    } else if (lowerMessage.includes('pharmacie') || lowerMessage.includes('disponibilité')) {
+                        return "Nous pouvons vous indiquer les pharmacies les plus proches. Vous pouvez envoyer votre ordonnance directement à la pharmacie de votre choix.";
+                    } else if (lowerMessage.includes('heure') || lowerMessage.includes('ouvert')) {
+                        return "Les horaires des pharmacies varient. Vous pouvez consulter les horaires spécifiques de chaque pharmacie dans la section 'Pharmacies' après avoir recherché un médicament.";
+                    } else {
+                        return "Je suis désolé, je n'ai pas bien compris. Pouvez-vous reformuler votre question ? Je peux vous aider avec les ordonnances, la recherche de médicaments et la localisation des pharmacies.";
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
