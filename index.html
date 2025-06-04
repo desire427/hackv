@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion - PharmaConnect</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .auth-container {
+            min-height: 100vh;
+            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1579684385127-1ef15d508118?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .auth-card {
+            backdrop-filter: blur(10px);
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .social-btn {
+            transition: all 0.3s ease;
+        }
+
+        .social-btn:hover {
+            transform: translateY(-3px);
+        }
+    </style>
+</head>
+<body class="font-sans">
+    <!-- Auth Container -->
+    <div class="auth-container flex items-center justify-center p-4">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-6">
+                    <div class="auth-card shadow-lg">
+                        <div class="row g-0">
+                            <!-- Left Side - Image (hidden on mobile) -->
+                            <div class="col-md-5 d-none d-md-block">
+                                <img src="https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1013&q=80"
+                                     alt="Login" class="w-100 h-100 object-cover">
+                            </div>
+
+                            <!-- Right Side - Form -->
+                            <div class="col-md-7">
+                                <div class="p-5">
+                                    <div class="text-center mb-5">
+                                        <a href="index.html" class="d-flex align-items-center justify-content-center text-decoration-none">
+                                            <i class="fas fa-prescription-bottle-alt text-3xl text-blue-600 me-2"></i>
+                                            <span class="text-2xl font-bold">PharmaConnect</span>
+                                        </a>
+                                        <p class="text-gray-600 mt-2">Connectez-vous pour accéder à votre espace</p>
+                                    </div>
+
+                                    <!-- Social Login -->
+                                    <div class="mb-4">
+                                        <div class="row g-2">
+                                            <div class="col">
+                                                <a href="#" class="btn btn-outline-primary w-100 social-btn">
+                                                    <i class="fab fa-google me-2"></i> Google
+                                                </a>
+                                            </div>
+                                            <div class="col">
+                                                <a href="#" class="btn btn-outline-primary w-100 social-btn">
+                                                    <i class="fab fa-facebook-f me-2"></i> Facebook
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="divider d-flex align-items-center my-4">
+                                        <p class="text-center mx-3 mb-0 text-gray-500">OU</p>
+                                    </div>
+
+                                    <!-- Login Form -->
+                                    <form>
+                                        <div class="mb-3">
+                                            <label for="email" class="form-label">Adresse email</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                                <input type="email" class="form-control" id="email" placeholder="votre@email.com" required>
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="password" class="form-label">Mot de passe</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                                <input type="password" class="form-control" id="password" placeholder="••••••••" required>
+                                                <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div class="d-flex justify-content-between align-items-center mb-4">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="remember">
+                                                <label class="form-check-label" for="remember">Se souvenir de moi</label>
+                                            </div>
+                                            <a href="#" id="forgotPasswordLink" class="text-sm text-blue-600">Mot de passe oublié ?</a>
+                                        </div>
+
+                                        <button type="submit" class="btn btn-primary w-100 py-2 mb-3">
+                                            <i class="fas fa-sign-in-alt me-2"></i> Se connecter
+                                        </button>
+
+                                        <div class="text-center">
+                                            <p class="text-gray-600">Pas encore de compte ? <a href="inscription.html" class="text-blue-600">S'inscrire</a></p>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Toggle password visibility
+            const togglePassword = document.querySelector('#togglePassword');
+            const password = document.querySelector('#password');
+
+            togglePassword.addEventListener('click', function() {
+                const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+                password.setAttribute('type', type);
+                this.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+            });
+
+            // Form submission
+            const form = document.querySelector('form');
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+
+                // Récupérer tous les utilisateurs
+                const users = JSON.parse(localStorage.getItem('users')) || [];
+                const userData = users.find(u => u.email === email && u.password === password);
+
+                if (userData) {
+                    alert('Connexion réussie!');
+
+                    // Rediriger vers la page appropriée en fonction du rôle
+                    if (userData.role === 'pharmacien') {
+                        window.location.href = 'espace-pharmacie.html'; // Page pour les pharmaciens
+                    } else {
+                        window.location.href = 'accueil-patient.html'; // Page pour les patients
+                    }
+                } else {
+                    alert('Email ou mot de passe incorrect');
+                }
+            });
+
+            // Gestion du mot de passe oublié
+            document.getElementById('forgotPasswordLink').addEventListener('click', function(e) {
+                e.preventDefault();
+                const email = prompt("Veuillez entrer votre adresse email pour récupérer votre mot de passe :");
+                if (email) {
+                    const users = JSON.parse(localStorage.getItem('users')) || [];
+                    const userData = users.find(u => u.email === email);
+                    if (userData) {
+                        alert("Votre mot de passe est : " + userData.password);
+                    } else {
+                        alert("Aucun compte trouvé avec cet email.");
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
