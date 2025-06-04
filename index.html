@@ -105,7 +105,7 @@
                                                 <input class="form-check-input" type="checkbox" id="remember">
                                                 <label class="form-check-label" for="remember">Se souvenir de moi</label>
                                             </div>
-                                            <a href="#" id="forgotPasswordLink" class="text-sm text-blue-600">Mot de passe oublié ?</a>
+                                            <a href="mot-de-passe-oublie.html" id="forgotPasswordLink" class="text-sm text-blue-600">Mot de passe oublié ?</a>
                                         </div>
 
                                         <button type="submit" class="btn btn-primary w-100 py-2 mb-3">
@@ -169,16 +169,8 @@
             // Gestion du mot de passe oublié
             document.getElementById('forgotPasswordLink').addEventListener('click', function(e) {
                 e.preventDefault();
-                const email = prompt("Veuillez entrer votre adresse email pour récupérer votre mot de passe :");
-                if (email) {
-                    const users = JSON.parse(localStorage.getItem('users')) || [];
-                    const userData = users.find(u => u.email === email);
-                    if (userData) {
-                        alert("Votre mot de passe est : " + userData.password);
-                    } else {
-                        alert("Aucun compte trouvé avec cet email.");
-                    }
-                }
+                // Rediriger vers la page de récupération de mot de passe
+                window.location.href = 'mot-de-passe-oublie.html';
             });
         });
     </script>
