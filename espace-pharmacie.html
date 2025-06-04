@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PharmaConnect - Espace Pharmacie</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .pharmacy-header {
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://images.unsplash.com/photo-1587854692152-cbe660dbde88?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2069&q=80');
+            background-size: cover;
+            background-position: center;
+            min-height: 300px;
+        }
+
+        .status-open {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-closed {
+            background-color: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .stock-low {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .stock-out {
+            background-color: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .stock-ok {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+    </style>
+</head>
+<body class="font-sans bg-gray-50">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-blue-800 shadow-lg sticky-top">
+        <div class="container">
+            <a class="navbar-brand flex items-center" href="#">
+                <i class="fas fa-prescription-bottle-alt text-2xl mr-2"></i>
+                <span class="text-xl font-bold">PharmaConnect</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Accueil</a></li>
+                    <li class="nav-item"><a class="nav-link" href="recherche1.html">Recherche</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="pharmacies.html">Espace Pharmacie</a></li>
+                    <li class="nav-item"><a class="nav-link" href="ordonnance.html">Ordonnance</a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user-circle me-1"></i> Pharmacie du Centre
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Paramètres</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-chart-line me-2"></i>Statistiques</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-sign-out-alt me-2"></i>Déconnexion</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Pharmacy Header -->
+    <section class="pharmacy-header flex items-center text-white">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="text-3xl md:text-4xl font-bold mb-3">Espace Pharmacie</h1>
+                    <p class="text-xl mb-4">Gérez votre stock et votre statut en temps réel</p>
+                    <div class="d-flex align-items-center">
+                        <div id="statusIndicator" class="rounded-full w-4 h-4 me-2"></div>
+                        <span id="statusText" class="font-medium">Chargement du statut...</span>
+                    </div>
+                </div>
+                <div class="col-md-4 text-md-end mt-4 mt-md-0">
+                    <button id="toggleStatusBtn" class="btn btn-lg px-5">
+                        <i class="fas fa-store me-2"></i> Chargement...
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <section class="py-8">
+        <div class="container">
+            <div class="row">
+                <!-- Sidebar -->
+                <div class="col-lg-3 mb-5 mb-lg-0">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-blue-700 text-white">
+                            <h5 class="mb-0"><i class="fas fa-tachometer-alt me-2"></i> Tableau de bord</h5>
+                        </div>
+                        <div class="list-group list-group-flush">
+                            <a href="#" class="list-group-item list-group-item-action active">
+                                <i class="fas fa-pills me-2"></i> Gestion des stocks
+                            </a>
+                            <a href="#" class="list-group-item list-group-item-action">
+                                <i class="fas fa-calendar-alt me-2"></i> Réservations
+                            </a>
+                            <a href="#" class="list-group-item list-group-item-action">
+                                <i class="fas fa-chart-bar me-2"></i> Statistiques
+                            </a>
+                            <a href="#" class="list-group-item list-group-item-action">
+                                <i class="fas fa-store me-2"></i> Profil pharmacie
+                            </a>
+                            <a href="#" class="list-group-item list-group-item-action">
+                                <i class="fas fa-bell me-2"></i> Notifications
+                            </a>
+                            <a href="#" class="list-group-item list-group-item-action">
+                                <i class="fas fa-cog me-2"></i> Paramètres
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="card shadow-sm mt-4">
+                        <div class="card-header bg-blue-700 text-white">
+                            <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i> Informations rapides</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <h6 class="font-bold mb-1">Statut actuel</h6>
+                                <div id="quickStatus" class="badge py-2 px-3 rounded-pill">Chargement...</div>
+                            </div>
+                            <div class="mb-3">
+                                <h6 class="font-bold mb-1">Médicaments en stock</h6>
+                                <span id="medCount">--</span>
+                            </div>
+                            <div class="mb-3">
+                                <h6 class="font-bold mb-1">Réservations aujourd'hui</h6>
+                                <span>5</span>
+                            </div>
+                            <div>
+                                <h6 class="font-bold mb-1">Alertes stock</h6>
+                                <span id="alertCount" class="badge bg-red-500 text-white">--</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Panel -->
+                <div class="col-lg-9">
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-header bg-white border-bottom">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0"><i class="fas fa-pills me-2"></i> Gestion des stocks</h5>
+                                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addMedModal">
+                                    <i class="fas fa-plus me-1"></i> Ajouter médicament
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-4">
+                                <div class="input-group">
+                                    <input type="text" id="searchMedInput" class="form-control" placeholder="Rechercher un médicament...">
+                                    <button class="btn btn-outline-secondary" type="button">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Médicament</th>
+                                            <th>Code</th>
+                                            <th>Stock</th>
+                                            <th>Statut</th>
+                                            <th>Prix</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="medsTableBody">
+                                        <!-- Les médicaments seront chargés ici dynamiquement -->
+                                        <tr>
+                                            <td colspan="6" class="text-center py-5">Chargement des médicaments...</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <nav aria-label="Page navigation">
+                                <ul class="pagination justify-content-center">
+                                    <li class="page-item disabled">
+                                        <a class="page-link" href="#" tabindex="-1">Précédent</a>
+                                    </li>
+                                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="#">Suivant</a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <div class="card shadow-sm h-100">
+                                <div class="card-header bg-white border-bottom">
+                                    <h5 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i> Alertes stock</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="list-group" id="alertsList">
+                                        <!-- Les alertes seront générées dynamiquement ici -->
+                                        <div class="text-center py-3" id="noAlertsMessage">
+                                            <i class="fas fa-check-circle text-green-500 text-3xl mb-2"></i>
+                                            <p class="text-gray-500">Aucune alerte de stock pour le moment</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 mb-4">
+                            <div class="card shadow-sm h-100">
+                                <div class="card-header bg-white border-bottom">
+                                    <h5 class="mb-0"><i class="fas fa-clock me-2"></i> Réservations récentes</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="list-group" id="reservationsList">
+                                        <!-- Les réservations seront générées dynamiquement ici -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-6">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 mb-4 mb-md-0">
+                    <h3 class="text-xl font-bold mb-3 flex items-center">
+                        <i class="fas fa-prescription-bottle-alt text-2xl mr-2"></i>
+                        PharmaConnect
+                    </h3>
+                    <p class="text-gray-400">Solution de gestion pour pharmacies et patients.</p>
+                </div>
+                <div class="col-md-3 mb-4 mb-md-0">
+                    <h4 class="font-bold mb-3">Support</h4>
+                    <ul class="list-unstyled text-gray-400">
+                        <li class="mb-2"><a href="#" class="hover:text-white">Centre d'aide</a></li>
+                        <li class="mb-2"><a href="#" class="hover:text-white">Contact</a></li>
+                        <li><a href="#" class="hover:text-white">FAQ</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h4 class="font-bold mb-3">Légal</h4>
+                    <ul class="list-unstyled text-gray-400">
+                        <li class="mb-2"><a href="#" class="hover:text-white">CGU</a></li>
+                        <li class="mb-2"><a href="#" class="hover:text-white">Confidentialité</a></li>
+                        <li><a href="#" class="hover:text-white">Mentions légales</a></li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="my-4 border-gray-700">
+            <div class="text-center text-gray-400">
+                <p>&copy; 2023 PharmaConnect. Tous droits réservés.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Add Medication Modal -->
+    <div class="modal fade" id="addMedModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Ajouter un médicament au stock</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addMedForm">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="medName" class="form-label">Nom du médicament</label>
+                                <input type="text" class="form-control" id="medName" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="medCode" class="form-label">Code CIP</label>
+                                <input type="text" class="form-control" id="medCode" required>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label for="medQuantity" class="form-label">Quantité</label>
+                                <input type="number" class="form-control" id="medQuantity" min="0" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="medPrice" class="form-label">Prix (€)</label>
+                                <input type="number" step="0.01" class="form-control" id="medPrice" min="0" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="medThreshold" class="form-label">Seuil d'alerte</label>
+                                <input type="number" class="form-control" id="medThreshold" min="1" value="5" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="medDescription" class="form-label">Description (optionnel)</label>
+                            <textarea class="form-control" id="medDescription" rows="2"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" form="addMedForm" class="btn btn-primary">Ajouter au stock</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Medication Modal -->
+    <div class="modal fade" id="editMedModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Modifier le médicament</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editMedForm">
+                        <input type="hidden" id="editMedId">
+                        <div class="mb-3">
+                            <label for="editMedName" class="form-label">Nom</label>
+                            <input type="text" class="form-control" id="editMedName" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editMedCode" class="form-label">Code CIP</label>
+                            <input type="text" class="form-control" id="editMedCode" readonly>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="editMedQuantity" class="form-label">Quantité</label>
+                                <input type="number" class="form-control" id="editMedQuantity" min="0" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editMedPrice" class="form-label">Prix (€)</label>
+                                <input type="number" step="0.01" class="form-control" id="editMedPrice" min="0" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editMedThreshold" class="form-label">Seuil d'alerte</label>
+                            <input type="number" class="form-control" id="editMedThreshold" min="1" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger me-auto" id="deleteMedBtn">
+                        <i class="fas fa-trash me-1"></i> Supprimer
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" form="editMedForm" class="btn btn-primary">Enregistrer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // État initial de la pharmacie (fermée)
+            let isPharmacyOpen = false;
+            const statusIndicator = document.getElementById('statusIndicator');
+            const statusText = document.getElementById('statusText');
+            const toggleStatusBtn = document.getElementById('toggleStatusBtn');
+            const quickStatus = document.getElementById('quickStatus');
+
+            // Charger les médicaments depuis localStorage ou initialiser avec des exemples
+            let sampleMeds = JSON.parse(localStorage.getItem('medications')) || [
+                { id: 1, name: "Paracétamol", code: "PAR123", quantity: 100, threshold: 10, price: 2.50 },
+                { id: 2, name: "Ibuprofène", code: "IBU456", quantity: 50, threshold: 5, price: 3.75 }
+            ];
+
+            // Sauvegarder les médicaments dans localStorage
+            function saveMedsToLocalStorage() {
+                localStorage.setItem('medications', JSON.stringify(sampleMeds));
+            }
+
+            // Mettre à jour l'état de la pharmacie
+            function updatePharmacyStatus() {
+                if (isPharmacyOpen) {
+                    statusIndicator.className = "rounded-full w-4 h-4 me-2 bg-green-500";
+                    statusText.textContent = "Ouvert";
+                    toggleStatusBtn.className = "btn btn-danger btn-lg px-5";
+                    toggleStatusBtn.innerHTML = '<i class="fas fa-store-slash me-2"></i> Fermer la pharmacie';
+                    quickStatus.className = "badge py-2 px-3 rounded-pill status-open";
+                    quickStatus.textContent = "Ouvert";
+                } else {
+                    statusIndicator.className = "rounded-full w-4 h-4 me-2 bg-red-500";
+                    statusText.textContent = "Fermé";
+                    toggleStatusBtn.className = "btn btn-success btn-lg px-5";
+                    toggleStatusBtn.innerHTML = '<i class="fas fa-store me-2"></i> Ouvrir la pharmacie';
+                    quickStatus.className = "badge py-2 px-3 rounded-pill status-closed";
+                    quickStatus.textContent = "Fermé";
+                }
+            }
+
+            // Générer les alertes de stock
+            function generateStockAlerts() {
+                const alertsList = document.getElementById('alertsList');
+                const noAlertsMessage = document.getElementById('noAlertsMessage');
+
+                alertsList.innerHTML = '';
+
+                const alertMeds = sampleMeds.filter(med => med.quantity <= med.threshold);
+
+                document.getElementById('alertCount').textContent = alertMeds.length;
+
+                if (alertMeds.length === 0) {
+                    alertsList.innerHTML = `
+                        <div class="text-center py-3" id="noAlertsMessage">
+                            <i class="fas fa-check-circle text-green-500 text-3xl mb-2"></i>
+                            <p class="text-gray-500">Aucune alerte de stock pour le moment</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                alertMeds.forEach(med => {
+                    const alertItem = document.createElement('div');
+                    alertItem.className = 'list-group-item';
+
+                    let alertText, alertClass;
+                    if (med.quantity === 0) {
+                        alertText = 'Stock épuisé';
+                        alertClass = 'text-red-500';
+                    } else {
+                        alertText = `Stock critique: ${med.quantity} unité${med.quantity > 1 ? 's' : ''}`;
+                        alertClass = 'text-yellow-600';
+                    }
+
+                    alertItem.innerHTML = `
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">${med.name}</h6>
+                                <small class="${alertClass}">${alertText}</small>
+                            </div>
+                            <button class="btn btn-sm btn-outline-primary restock-btn" data-id="${med.id}">
+                                <i class="fas fa-truck me-1"></i> Réappro.
+                            </button>
+                        </div>
+                    `;
+                    alertsList.appendChild(alertItem);
+                });
+
+                document.querySelectorAll('.restock-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const medId = parseInt(this.getAttribute('data-id'));
+                        const med = sampleMeds.find(m => m.id === medId);
+
+                        if (med) {
+                            const quantity = prompt(`Quantité à ajouter pour ${med.name}:`, "10");
+                            if (quantity && !isNaN(quantity) && parseInt(quantity) > 0) {
+                                med.quantity += parseInt(quantity);
+                                renderMedsTable();
+                                saveMedsToLocalStorage();
+                                alert(`Stock de ${med.name} mis à jour à ${med.quantity} unités.`);
+                            }
+                        }
+                    });
+                });
+            }
+
+            // Remplir le tableau des médicaments
+            const medsTableBody = document.getElementById('medsTableBody');
+
+            function renderMedsTable() {
+                medsTableBody.innerHTML = '';
+
+                if (sampleMeds.length === 0) {
+                    medsTableBody.innerHTML = `
+                        <tr>
+                            <td colspan="6" class="text-center py-5">Aucun médicament en stock. Ajoutez-en un pour commencer.</td>
+                        </tr>
+                    `;
+                    generateStockAlerts();
+                    return;
+                }
+
+                sampleMeds.forEach(med => {
+                    let statusClass, statusText;
+
+                    if (med.quantity === 0) {
+                        statusClass = "stock-out";
+                        statusText = "Épuisé";
+                    } else if (med.quantity <= med.threshold) {
+                        statusClass = "stock-low";
+                        statusText = "Stock bas";
+                    } else {
+                        statusClass = "stock-ok";
+                        statusText = "Disponible";
+                    }
+
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${med.name}</td>
+                        <td>${med.code}</td>
+                        <td>${med.quantity}</td>
+                        <td><span class="badge ${statusClass} py-1 px-2 rounded-pill">${statusText}</span></td>
+                        <td>${med.price.toFixed(2)} €</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary edit-btn" data-id="${med.id}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </td>
+                    `;
+                    medsTableBody.appendChild(row);
+                });
+
+                document.getElementById('medCount').textContent = sampleMeds.length;
+
+                generateStockAlerts();
+
+                document.querySelectorAll('.edit-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const medId = parseInt(this.getAttribute('data-id'));
+                        const med = sampleMeds.find(m => m.id === medId);
+
+                        if (med) {
+                            document.getElementById('editMedId').value = med.id;
+                            document.getElementById('editMedName').value = med.name;
+                            document.getElementById('editMedCode').value = med.code;
+                            document.getElementById('editMedQuantity').value = med.quantity;
+                            document.getElementById('editMedPrice').value = med.price.toFixed(2);
+                            document.getElementById('editMedThreshold').value = med.threshold;
+
+                            const editModal = new bootstrap.Modal(document.getElementById('editMedModal'));
+                            editModal.show();
+                        }
+                    });
+                });
+            }
+
+            // Bouton pour changer l'état
+            toggleStatusBtn.addEventListener('click', function() {
+                isPharmacyOpen = !isPharmacyOpen;
+                updatePharmacyStatus();
+                console.log(`Statut pharmacie mis à jour: ${isPharmacyOpen ? 'Ouvert' : 'Fermé'}`);
+            });
+
+            // Initialiser le statut
+            updatePharmacyStatus();
+
+            // Initialiser le tableau
+            renderMedsTable();
+
+            // Gestion du formulaire d'ajout
+            document.getElementById('addMedForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const newMed = {
+                    id: sampleMeds.length > 0 ? Math.max(...sampleMeds.map(m => m.id)) + 1 : 1,
+                    name: document.getElementById('medName').value,
+                    code: document.getElementById('medCode').value,
+                    quantity: parseInt(document.getElementById('medQuantity').value),
+                    threshold: parseInt(document.getElementById('medThreshold').value),
+                    price: parseFloat(document.getElementById('medPrice').value),
+                    status: "ok"
+                };
+
+                sampleMeds.push(newMed);
+                saveMedsToLocalStorage();
+                renderMedsTable();
+
+                this.reset();
+                document.getElementById('medThreshold').value = 5;
+
+                const addModal = bootstrap.Modal.getInstance(document.getElementById('addMedModal'));
+                addModal.hide();
+
+                alert(`Médicament ${newMed.name} ajouté avec succès!`);
+            });
+
+            // Gestion du formulaire d'édition
+            document.getElementById('editMedForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const medId = parseInt(document.getElementById('editMedId').value);
+                const medIndex = sampleMeds.findIndex(m => m.id === medId);
+
+                if (medIndex !== -1) {
+                    sampleMeds[medIndex].quantity = parseInt(document.getElementById('editMedQuantity').value);
+                    sampleMeds[medIndex].price = parseFloat(document.getElementById('editMedPrice').value);
+                    sampleMeds[medIndex].threshold = parseInt(document.getElementById('editMedThreshold').value);
+
+                    saveMedsToLocalStorage();
+                    renderMedsTable();
+
+                    const editModal = bootstrap.Modal.getInstance(document.getElementById('editMedModal'));
+                    editModal.hide();
+
+                    alert("Médicament mis à jour avec succès!");
+                }
+            });
+
+            // Gestion de la suppression
+            document.getElementById('deleteMedBtn').addEventListener('click', function() {
+                if (confirm("Êtes-vous sûr de vouloir supprimer ce médicament ?")) {
+                    const medId = parseInt(document.getElementById('editMedId').value);
+                    const medIndex = sampleMeds.findIndex(m => m.id === medId);
+
+                    if (medIndex !== -1) {
+                        sampleMeds.splice(medIndex, 1);
+                        saveMedsToLocalStorage();
+                        renderMedsTable();
+
+                        const editModal = bootstrap.Modal.getInstance(document.getElementById('editMedModal'));
+                        editModal.hide();
+
+                        alert("Médicament supprimé avec succès!");
+                    }
+                }
+            });
+
+            // Recherche de médicaments
+            document.getElementById('searchMedInput').addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+
+                if (searchTerm === '') {
+                    renderMedsTable();
+                    return;
+                }
+
+                const filteredMeds = sampleMeds.filter(med =>
+                    med.name.toLowerCase().includes(searchTerm) ||
+                    med.code.includes(searchTerm)
+                );
+
+                medsTableBody.innerHTML = '';
+
+                if (filteredMeds.length === 0) {
+                    medsTableBody.innerHTML = `
+                        <tr>
+                            <td colspan="6" class="text-center py-5">Aucun médicament trouvé</td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                filteredMeds.forEach(med => {
+                    let statusClass, statusText;
+
+                    if (med.quantity === 0) {
+                        statusClass = "stock-out";
+                        statusText = "Épuisé";
+                    } else if (med.quantity <= med.threshold) {
+                        statusClass = "stock-low";
+                        statusText = "Stock bas";
+                    } else {
+                        statusClass = "stock-ok";
+                        statusText = "Disponible";
+                    }
+
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${med.name}</td>
+                        <td>${med.code}</td>
+                        <td>${med.quantity}</td>
+                        <td><span class="badge ${statusClass} py-1 px-2 rounded-pill">${statusText}</span></td>
+                        <td>${med.price.toFixed(2)} €</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary edit-btn" data-id="${med.id}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </td>
+                    `;
+                    medsTableBody.appendChild(row);
+                });
+
+                document.querySelectorAll('.edit-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const medId = parseInt(this.getAttribute('data-id'));
+                        const med = sampleMeds.find(m => m.id === medId);
+
+                        if (med) {
+                            document.getElementById('editMedId').value = med.id;
+                            document.getElementById('editMedName').value = med.name;
+                            document.getElementById('editMedCode').value = med.code;
+                            document.getElementById('editMedQuantity').value = med.quantity;
+                            document.getElementById('editMedPrice').value = med.price.toFixed(2);
+                            document.getElementById('editMedThreshold').value = med.threshold;
+
+                            const editModal = new bootstrap.Modal(document.getElementById('editMedModal'));
+                            editModal.show();
+                        }
+                    });
+                });
+            });
+
+            // Afficher les réservations récentes
+            const reservationsList = document.getElementById('reservationsList');
+            let reservations = JSON.parse(localStorage.getItem('reservations')) || [];
+
+            if (reservations.length === 0) {
+                reservationsList.innerHTML = '<div class="list-group-item">Aucune réservation récente.</div>';
+            } else {
+                reservations.forEach(reservation => {
+                    const reservationItem = document.createElement('div');
+                    reservationItem.className = 'list-group-item';
+                    reservationItem.innerHTML = `
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h6 class="mb-1">${reservation.product} - ${reservation.pharmacy}</h6>
+                                <small>Patient: ${reservation.patientName}</small><br>
+                                <small>Téléphone: ${reservation.patientPhone}</small>
+                            </div>
+                            <div class="text-end">
+                                <small class="text-muted">${reservation.timestamp}</small>
+                                <div class="badge bg-info text-dark mt-1">En attente</div>
+                            </div>
+                        </div>
+                    `;
+                    reservationsList.appendChild(reservationItem);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
